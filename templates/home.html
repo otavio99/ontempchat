@@ -279,7 +279,7 @@
                 },
                 startPolling() {
                     if (this.fetchInterval) clearInterval(this.fetchInterval);
-                    this.fetchInterval = setInterval(this.fetchMessages, 3000); 
+                    this.fetchInterval = setInterval(this.fetchMessages, 5000); 
                 },
                 copyToClipboard() {
                     navigator.clipboard.writeText(this.url).then(() => {
