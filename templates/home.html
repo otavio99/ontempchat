@@ -220,11 +220,10 @@
                 async createChat() {
                     const response = await fetch('/create_chat', { method: 'POST' });
                     const data = await response.json();
+                    this.chatId = data.chat_id;
                     const url = new URL(window.location.href);
                     url.searchParams.set('chat_id', this.chatId);
                     this.url = url.href
-
-                    this.chatId = data.chat_id;
                 },
                 getChatIdFromURL() {
                     const params = new URLSearchParams(window.location.search);
