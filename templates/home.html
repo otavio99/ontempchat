@@ -257,7 +257,12 @@
                     this.fetchMessages();
                 },
                 async fetchMessages() {
-                    const response = await fetch(`/get_messages?chat_id=${this.chatId}`);
+                    response = {};
+                    if (this.chatId) {
+                        response = await fetch(`/get_messages?chat_id=${this.chatId}`);
+                    } else {
+                        response = await fetch(`/get_messages?chat_id=${localStorage.getItem('chatId')}`);
+                    }
                     this.messages = await response.json();
                 },
                 saveSession() {
@@ -279,7 +284,7 @@
                 },
                 startPolling() {
                     if (this.fetchInterval) clearInterval(this.fetchInterval);
-                    this.fetchInterval = setInterval(this.fetchMessages, 5000); 
+                    this.fetchInterval = setInterval(this.fetchMessages, 3000); 
                 },
                 copyToClipboard() {
                     navigator.clipboard.writeText(this.url).then(() => {
