@@ -103,6 +103,20 @@
             background: #005ecb;
         }
 
+        .create-button {
+            background: rgb(52, 160, 52);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .create-button:hover {
+            background:  rgb(39, 134, 39);
+        }
+
         .logout-btn {
             background: red;
             margin: 10px;
@@ -154,15 +168,20 @@
 <body>
     <div id="app">
         
-        <div class="header">Temporary Chat</div>
+        <div class="header">OnChat Temporário</div>
         
         <div v-if="!joined" class="join-container">
             <div class="join-form">
                 <input v-model="chatId" placeholder="Chat ID">
-                <input v-model="username" placeholder="Username">
-                <input v-model="accessCode" placeholder="Access Code (Optional)">
+                <input v-model="username" placeholder="Nome de Usuário">
+                <input v-model="accessCode" placeholder="Código de Acesso">
             </div>
-            <button @click="joinChat">Join Chat</button>
+            <button @click="joinChat">Entrar</button>
+            <br>
+            <button @click="createChat" class="create-button">Criar Novo Chat</button>
+            <p v-if="url">Compartilhar chat: <strong><a href="#" @click="copyToClipboard">{{ url }}</a></strong> 
+                <br><br><span v-if="copiedMessage" style="color: green;">Link Copiado!</span>
+            </p>
         </div>
         
 
@@ -192,10 +211,25 @@
                     message: '',
                     messages: [],
                     joined: !!localStorage.getItem('joined'),
-                    fetchInterval: null
+                    fetchInterval: null,
+                    url: '',
+                    copiedMessage: false
                 };
             },
             methods: {
+                async createChat() {
+                    const response = await fetch('/create_chat', { method: 'POST' });
+                    const data = await response.json();
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('chat_id', this.chatId);
+                    this.url = url.href
+
+                    this.chatId = data.chat_id;
+                },
+                getChatIdFromURL() {
+                    const params = new URLSearchParams(window.location.search);
+                    this.chatId = params.get('chat_id') || '';
+                },
                 async joinChat() {
                     const response = await fetch('/join_chat', {
                         method: 'POST',
@@ -246,6 +280,12 @@
                 startPolling() {
                     if (this.fetchInterval) clearInterval(this.fetchInterval);
                     this.fetchInterval = setInterval(this.fetchMessages, 3000); 
+                },
+                copyToClipboard() {
+                    navigator.clipboard.writeText(this.url).then(() => {
+                        this.copiedMessage = true;
+                        setTimeout(() => this.copiedMessage = false, 2000);
+                    });
                 }
             },
             mounted() {
@@ -253,6 +293,7 @@
                     this.fetchMessages();
                     this.startPolling();
                 }
+                this.getChatIdFromURL();
             },
             beforeUnmount() {
                 clearInterval(this.fetchInterval);
