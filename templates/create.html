@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporary Group Chat</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #app { max-width: 400px; margin: auto; text-align: center; }
+        input, button { margin: 5px; padding: 10px; width: 90%; }
+        .chat-box { border: 1px solid #ccc; height: 300px; overflow-y: auto; padding: 10px; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h2>Temporary Chat</h2>
+        <div v-if="!chatId">
+            <button @click="createChat">Create New Chat</button>
+        </div>
+        <div v-if="chatId && !joined">
+            <p>Chat ID: <strong>{{ chatId }}</strong></p>
+            <input v-model="username" placeholder="Username">
+            <input v-model="accessCode" placeholder="Access Code (Optional)">
+            <button @click="joinChat">Join Chat</button>
+        </div>
+        <div v-else-if="joined">
+            <div class="chat-box">
+                <div v-for="msg in messages" :key="msg.timestamp"> 
+                    <strong>{{ msg.username }}:</strong> {{ msg.message }}
+                </div>
+            </div>
+            <input v-model="message" placeholder="Type a message">
+            <button @click="sendMessage">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    chatId: '',
+                    username: '',
+                    accessCode: '',
+                    message: '',
+                    messages: [],
+                    joined: false
+                };
+            },
+            methods: {
+                async createChat() {
+                    const response = await fetch('/create_chat', { method: 'POST' });
+                    const data = await response.json();
+                    this.chatId = data.chat_id;
+                },
+                async joinChat() {
+                    const response = await fetch('/join_chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chat_id: this.chatId, username: this.username, access_code: this.accessCode })
+                    });
+                    const data = await response.json();
+                    if (data.access_code) {
+                        this.accessCode = data.access_code;
+                        this.joined = true;
+                        this.fetchMessages();
+                    } else {
+                        alert('Error joining chat');
+                    }
+                },
+                async sendMessage() {
+                    await fetch('/send_message', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chat_id: this.chatId, username: this.username, access_code: this.accessCode, message: this.message })
+                    });
+                    this.message = '';
+                    this.fetchMessages();
+                },
+                async fetchMessages() {
+                    const response = await fetch(`/get_messages?chat_id=${this.chatId}`);
+                    this.messages = await response.json();
+                }
+            }
+        });
+        app.mount('#app');
+    </script>
+</body>
+</html>

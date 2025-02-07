@@ -1,0 +1,85 @@
+{% macro render_field(field) %}
+  <style>
+    .errordiv:last-child {
+      margin: inherit;
+    }
+  </style>
+  <div class="field">
+    <div class="control">
+      <!-- {{ field.label }} -->
+      {{ field(**kwargs)|safe }}
+    </div>
+    {% if field.errors %}
+      {% for error in field.errors %}
+      <div class="help is-pulled-left is-danger errordiv">
+        {{ error }}
+      </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <script>
+    document.querySelectorAll('.input').forEach((elm) => {
+      elm.addEventListener('input', (event) => {
+        document.querySelectorAll(".errordiv").forEach((elm) => {
+          elm.remove()
+        })
+      })
+    })
+  </script>
+  <script>
+    document.querySelectorAll('.textarea').forEach((elm) => {
+      elm.addEventListener('input', (event) => {
+        document.querySelectorAll(".errordiv").forEach((elm) => {
+          elm.remove()
+        })
+      })
+    })
+  </script>
+{% endmacro %}
+
+{% macro render_checkbox_field(field, label) %}
+  <div class="field">
+    <div class="control">
+      <label class="checkbox">
+        {{ field(**kwargs)|safe }} Eu concordo com os <a href="#">termos e condições</a>
+      </label>
+    </div>
+    {% if field.errors %}
+      {% for error in field.errors %}
+        <div class="help is-pulled-left is-danger errordiv">
+          {{ error }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+  <script>
+    document.querySelectorAll('.checkbox').forEach((elm) => {
+      elm.addEventListener('input', (event) => {
+        document.querySelectorAll(".errordiv").forEach((elm) => {
+          elm.remove()
+        })
+      })
+    })
+  </script>
+{% endmacro %}
+
+{% macro simple_render_field(field, label) %}
+  {{ field(**kwargs)|safe }}
+  {% if field.errors %}
+    {% for error in field.errors %}
+      <div class="help is-pulled-left is-danger errordiv">
+        {{ error }}
+      </div>
+    {% endfor %}
+  {% endif %}
+  <script>
+    document.querySelectorAll('.checkbox').forEach((elm) => {
+      elm.addEventListener('input', (event) => {
+        document.querySelectorAll(".errordiv").forEach((elm) => {
+          elm.remove()
+        })
+      })
+    })
+  </script>
+{% endmacro %}
