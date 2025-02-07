@@ -258,11 +258,7 @@
                 },
                 async fetchMessages() {
                     response = {};
-                    if (this.chatId) {
-                        response = await fetch(`/get_messages?chat_id=${this.chatId}`);
-                    } else {
-                        response = await fetch(`/get_messages?chat_id=${localStorage.getItem('chatId')}`);
-                    }
+                    response = await fetch(`/get_messages?chat_id=${localStorage.getItem('chatId')}`);
                     this.messages = await response.json();
                 },
                 saveSession() {
