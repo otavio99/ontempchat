@@ -174,7 +174,7 @@
             <div class="join-form">
                 <input v-model="chatId" placeholder="Chat ID">
                 <input v-model="username" placeholder="Nome de Usuário">
-                <input v-model="accessCode" placeholder="Código de Acesso">
+                <input v-model="accessCode" placeholder="Código de Acesso" hidden>
             </div>
             <button @click="joinChat">Entrar</button>
             <br>
@@ -237,8 +237,9 @@
                         body: JSON.stringify({ chat_id: this.chatId, username: this.username, access_code: this.accessCode })
                     });
                     const data = await response.json();
-                    if (data.access_code) {
-                        this.accessCode = data.access_code;
+                    //if (data.access_code) {
+                    if (true) {
+                        //this.accessCode = data.access_code;
                         this.joined = true;
                         this.saveSession();
                         this.fetchMessages();
